@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Comparendos Jolifoods</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232b2a55'/%3E%3Ctext x='16' y='23' font-size='20' font-weight='700' text-anchor='middle' fill='%23c8a23a' font-family='Arial'%3EJ%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{--bg:#f3f4f7;--card:#fff;--ink:#1b2234;--mut:#667085;--line:#e2e5ec;--field:#fff;--soft:#f7f8fa;
+--brand:#2b2a55;--brand2:#3c3a73;--acc:#c8a23a;--onbrand:#fff;
+--sst:#b42318;--sstb:#fef0ee;--cal:#067647;--calb:#e8f6ee;--ope:#1849a9;--opeb:#eaf1fc;--warn:#b54708;
+--paper:#fcfcfd;--sh:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.08);
+--f:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111422;--card:#1a1e30;--ink:#eceef6;--mut:#9aa1b8;--line:#2b3048;--field:#141829;--soft:#171b2b;--brand:#4a489a;--brand2:#5b59b0;--sstb:#3b1c24;--calb:#16301f;--opeb:#1a2744;--sst:#f87171;--cal:#4ade80;--ope:#8db3ff;--warn:#fbbf24;color-scheme:dark}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--f);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+[hidden]{display:none!important}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+
+/* Barra superior */
+.top{background:var(--brand);color:var(--onbrand);border-bottom:3px solid var(--acc)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{width:38px;height:38px;border-radius:9px;background:var(--acc);color:#2b2a55;display:grid;place-items:center;font-weight:800;font-size:1.15rem;flex:none}
+.brand b{display:block;font-size:1rem;letter-spacing:.01em}
+.brand small{display:block;color:#c9cbe6;font-size:.78rem}
+.sync{display:inline-flex;align-items:center;gap:7px;font-size:.78rem;color:#dcdff2;background:rgba(255,255,255,.1);padding:5px 12px;border-radius:99px;white-space:nowrap}
+.sync::before{content:"";width:8px;height:8px;border-radius:50%;background:#aab}
+.sync[data-state=shared]::before{background:#4ade80}.sync[data-state=local]::before{background:#fbbf24}.sync[data-state=error]::before{background:#f87171}
+
+main{padding-block:24px 48px}
+/* Indicadores */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--sh);border-top:3px solid var(--brand)}
+.kpi span{display:block;color:var(--mut);font-size:.78rem;font-weight:500}
+.kpi b{display:block;font-size:1.9rem;font-weight:700;line-height:1.2;margin-top:2px;font-variant-numeric:tabular-nums}
+.kpi.s{border-top-color:var(--sst)}.kpi.c{border-top-color:var(--cal)}.kpi.o{border-top-color:var(--ope)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--sh);padding:28px;margin-bottom:20px}
+.head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin-bottom:6px}
+.head h2{margin:0;font-size:1.15rem;font-weight:700}
+.sec{display:flex;align-items:center;gap:10px;margin:30px 0 14px;padding-top:22px;border-top:1px solid var(--line);font-size:.95rem;font-weight:700}
+.sec:first-of-type{margin-top:18px;padding-top:0;border-top:0}
+.sec i{width:24px;height:24px;border-radius:50%;background:var(--brand);color:var(--onbrand);font-style:normal;font-size:.75rem;display:grid;place-items:center;flex:none}
+.sub{margin:4px 0 10px;color:var(--mut);font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em}
+.sub.sp{margin-top:20px}
+.g3,.g2{display:grid;gap:16px}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.fg{display:flex;flex-direction:column;gap:6px;min-width:0}
+label,.lb{font-size:.78rem;font-weight:600;color:var(--mut)}
+input[type=text],input[type=date],input[type=time],input[type=search],select,textarea{width:100%;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--field);font-size:16px;transition:border-color .15s,box-shadow .15s}
+textarea{resize:vertical;line-height:1.45}
+input:focus,select:focus,textarea:focus{outline:0;border-color:var(--brand2);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand2) 22%,transparent)}
+button:focus-visible,summary:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.hint{font-size:.78rem;color:var(--mut);margin:10px 0 0}
+
+/* Opciones */
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.choice{flex:1 1 130px;padding:11px 12px;border:1px solid var(--line);border-radius:8px;background:var(--field);font-weight:600;font-size:.88rem;color:var(--mut);cursor:pointer;text-align:center;transition:all .15s}
+.choice:hover{border-color:var(--brand2);color:var(--ink)}
+.choice[aria-pressed=true]{background:var(--brand);border-color:var(--brand);color:var(--onbrand)}
+.choice[data-type=SST][aria-pressed=true]{background:var(--sst);border-color:var(--sst)}
+.choice[data-type=Calidad][aria-pressed=true]{background:var(--cal);border-color:var(--cal)}
+.choice[data-type=Operación][aria-pressed=true]{background:var(--ope);border-color:var(--ope)}
+.choice[aria-pressed=true]{color:#fff}
+
+/* Firmas */
+.sig{position:relative;border:1px solid var(--line);border-radius:8px;background:var(--paper);overflow:hidden}
+.sig::after{content:"";position:absolute;left:8%;right:8%;bottom:28px;border-bottom:1px solid #c7ccd8;pointer-events:none}
+canvas{display:block;width:100%;aspect-ratio:3/1;cursor:crosshair;touch-action:none}
+.clr{position:absolute;top:8px;right:8px;background:#eef0f4;color:#3b4254;border:0;border-radius:6px;padding:4px 10px;font-size:.75rem;font-weight:600;cursor:pointer}
+.clr:hover{background:#e0e3ea}
+
+.msg{margin-top:20px;padding:10px 12px;border:1px solid var(--sst);background:var(--sstb);color:var(--sst);border-radius:8px;font-weight:600;font-size:.88rem}
+.note{margin-top:16px;padding:10px 12px;border:1px solid var(--warn);color:var(--warn);border-radius:8px;font-size:.85rem;font-weight:600}
+.acts{margin-top:26px;display:flex;flex-wrap:wrap;gap:12px;justify-content:flex-end}
+.btn{padding:12px 22px;border-radius:8px;font-weight:600;font-size:.95rem;cursor:pointer;border:1px solid transparent;transition:background .15s}
+.btn.p{background:var(--brand);color:#fff}.btn.p:hover{background:var(--brand2)}.btn.p:disabled{opacity:.6;cursor:not-allowed}
+.btn.g{background:transparent;border-color:var(--line);color:var(--mut)}.btn.g:hover{background:var(--soft);color:var(--ink)}
+
+/* Registros */
+.find{max-width:260px}
+.recs{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.empty{border:1px dashed var(--line);border-radius:10px;padding:28px 16px;text-align:center;color:var(--mut);background:var(--soft)}
+.empty strong{display:block;color:var(--ink);margin-bottom:4px}
+.rec{border:1px solid var(--line);border-left:4px solid var(--line);border-radius:10px;background:var(--card);min-width:0}
+.rec.t-s{border-left-color:var(--sst)}.rec.t-c{border-left-color:var(--cal)}.rec.t-o{border-left-color:var(--ope)}
+.rec[open]{box-shadow:var(--sh)}
+.rec summary{list-style:none;cursor:pointer;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.rec summary::-webkit-details-marker{display:none}
+.rt{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.rt time{margin-left:auto;font-size:.78rem;color:var(--mut);font-variant-numeric:tabular-nums}
+.rm{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px}.rm strong{overflow-wrap:anywhere}
+.mut{color:var(--mut);font-size:.85rem}
+.chip{padding:2px 9px;border-radius:99px;font-size:.72rem;font-weight:600;background:var(--soft);border:1px solid var(--line);color:var(--mut)}
+.chip.s{background:var(--sstb);color:var(--sst);border-color:transparent}.chip.c{background:var(--calb);color:var(--cal);border-color:transparent}.chip.o{background:var(--opeb);color:var(--ope);border-color:transparent}
+.rb{border-top:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:14px}
+.facts,.sigs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px}
+.fact .lb{display:block;margin-bottom:2px}.fact div{overflow-wrap:anywhere}
+.story{white-space:pre-wrap}
+.sigs figure{margin:0;min-width:0}.sigs img{display:block;width:100%;background:var(--paper);border:1px solid var(--line);border-radius:6px}
+.sigs figcaption{font-size:.75rem;color:var(--mut);margin-top:4px}
+.del{align-self:flex-start;background:transparent;border:1px solid var(--sst);color:var(--sst);border-radius:6px;padding:6px 12px;font-size:.8rem;font-weight:600;cursor:pointer}
+.del[data-armed=true]{background:var(--sst);color:#fff}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--brand);color:#fff;padding:11px 18px;border-radius:8px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:calc(100vw - 32px);z-index:10}
+@media (max-width:760px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.g3,.g2,.facts,.sigs{grid-template-columns:minmax(0,1fr)}.card{padding:20px 16px}.wrap{padding:0 14px}.find{max-width:none;width:100%}.brand small{display:none}.acts .btn{flex:1}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ===== Segunda versión: navegación, panel y herramientas ===== */
+.top{border-bottom:0;background:linear-gradient(180deg,var(--brand2),var(--brand))}
+.bar{padding-block:16px 6px}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.tabs button{background:transparent;border:0;border-bottom:3px solid transparent;color:#c4c7e6;padding:12px 16px;font-weight:600;font-size:.9rem;cursor:pointer;white-space:nowrap;transition:color .15s}
+.tabs button:hover{color:#fff}
+.tabs button.on{color:#fff;border-bottom-color:var(--acc)}
+.pagehead{padding:28px 0 20px}
+.pagehead h1{margin:0;font-size:1.65rem;font-weight:700;letter-spacing:-.02em}
+.pagehead p{margin:4px 0 0;color:var(--mut)}
+body[data-v=resumen] [data-view]:not([data-view=resumen]),body[data-v=nuevo] [data-view]:not([data-view=nuevo]),body[data-v=registros] [data-view]:not([data-view=registros]){display:none}
+main>[data-view]{animation:in .28s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.kpi b{letter-spacing:-.02em}
+.charts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.charts .card{margin:0;padding:22px}
+.ch h3{margin:0 0 16px;font-size:.9rem;font-weight:700}
+.wide{grid-column:1/-1}
+.bar-r+.bar-r{margin-top:14px}
+.bar-t{display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:6px}
+.bar-b{height:8px;background:var(--soft);border-radius:99px;overflow:hidden}
+.bar-b i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--brand2),var(--acc));transition:width .6s}
+.rw{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.rw:first-child{border-top:0;padding-top:0}
+.rw time{margin-left:auto;font-size:.8rem}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.fsel{width:auto}
+.btn.sm{padding:9px 14px;font-size:.85rem}
+@media (max-width:760px){.charts{grid-template-columns:minmax(0,1fr)}.pagehead{padding:20px 0 14px}.pagehead h1{font-size:1.35rem}.tools{width:100%}.fsel{flex:1}}
+</style>
+</head>
+<body data-v="resumen">
+<header class="top"><div class="wrap bar">
+  <div class="brand"><span class="logo">J</span><div><b>Jolifoods S.A.S</b><small>Control de Comparendos Disciplinarios</small></div></div>
+  <span class="sync" id="sync" data-state="connecting" aria-live="polite">Conectando…</span>
+</div>
+  <nav class="wrap tabs" aria-label="Secciones">
+    <button type="button" data-go="resumen" class="on">Resumen</button>
+    <button type="button" data-go="nuevo">Nuevo comparendo</button>
+    <button type="button" data-go="registros">Registros</button>
+  </nav>
+</header>
+
+<main class="wrap">
+  <div class="pagehead"><h1 id="pgT">Resumen general</h1><p id="pgS"></p></div>
+  <section class="kpis" data-view="resumen" aria-label="Resumen">
+    <div class="kpi"><span>Total registrados</span><b id="kTot">0</b></div>
+    <div class="kpi s"><span>SST</span><b id="kSST">0</b></div>
+    <div class="kpi c"><span>Calidad</span><b id="kCal">0</b></div>
+    <div class="kpi o"><span>Operación</span><b id="kOpe">0</b></div>
+  </section>
+
+  <section class="charts" data-view="resumen">
+    <div class="card ch"><h3>Por tipo</h3><div id="bTipo"></div></div>
+    <div class="card ch"><h3>Por departamento</h3><div id="bDep"></div></div>
+    <div class="card ch"><h3>Por afectación</h3><div id="bAf"></div></div>
+    <div class="card ch wide"><h3>Últimos comparendos</h3><div id="recent"></div></div>
+  </section>
+
+  <form id="comparendoForm" class="card" data-view="nuevo" autocomplete="off">
+
+    <h3 class="sec"><i>1</i>Datos generales de la infracción</h3>
+    <div class="g3">
+      <div class="fg"><label for="fecha">Fecha</label><input type="date" id="fecha" required></div>
+      <div class="fg"><label for="hora">Hora</label><input type="time" id="hora" required></div>
+      <div class="fg"><label for="departamento">Departamento</label>
+        <select id="departamento" required><option value="">Seleccionar</option><option value="Producción">Producción</option><option value="Logística">Logística</option></select></div>
+    </div>
+    <div class="fg" style="margin-top:16px" id="grupoTipo"><span class="lb">Tipo / Dominio</span>
+      <div class="row">
+        <button type="button" class="choice" data-type="SST" aria-pressed="false">SST</button>
+        <button type="button" class="choice" data-type="Calidad" aria-pressed="false">Calidad</button>
+        <button type="button" class="choice" data-type="Operación" aria-pressed="false">Operación</button>
+      </div></div>
+
+    <h3 class="sec"><i>2</i>Personal involucrado</h3>
+    <div class="sub">A. Persona que detecta la falta</div>
+    <div class="g3">
+      <div class="fg"><label for="detectaCedula">Cédula</label><input type="text" id="detectaCedula" placeholder="Ingrese cédula" inputmode="numeric" required></div>
+      <div class="fg"><label for="detectaNombre">Nombre</label><input type="text" id="detectaNombre" placeholder="Nombre completo" required></div>
+      <div class="fg"><label for="detectaCargo">Cargo</label><input type="text" id="detectaCargo" placeholder="Cargo" required></div>
+    </div>
+    <div class="sub sp">B. Quien comete la falta</div>
+    <div class="g3">
+      <div class="fg"><label for="infractorCedula">Cédula</label><input type="text" id="infractorCedula" placeholder="Ingrese cédula" inputmode="numeric" required></div>
+      <div class="fg"><label for="infractorNombre">Nombre</label><input type="text" id="infractorNombre" placeholder="Nombre completo" required></div>
+      <div class="fg"><label for="infractorCargo">Cargo</label><input type="text" id="infractorCargo" placeholder="Cargo" required></div>
+    </div>
+    <p class="hint">Demo: las cédulas 1017001 a 1017005 autocompletan nombre y cargo.</p>
+
+    <h3 class="sec"><i>3</i>Afectación</h3>
+    <div class="fg" id="grupoAfect"><span class="lb">Seleccione el tipo de afectación</span>
+      <div class="row">
+        <button type="button" class="choice" data-afect="Confidencialidad" aria-pressed="false">A. Confidencialidad</button>
+        <button type="button" class="choice" data-afect="Credibilidad" aria-pressed="false">B. Credibilidad</button>
+        <button type="button" class="choice" data-afect="Legal" aria-pressed="false">C. Legal</button>
+        <button type="button" class="choice" data-afect="Operativo" aria-pressed="false">D. Operativo</button>
+      </div></div>
+
+    <h3 class="sec"><i>4</i>Descripción de los hechos</h3>
+    <div class="fg"><label for="descripcion">Relato de lo ocurrido</label>
+      <textarea id="descripcion" rows="5" placeholder="Describa qué se observó, dónde, qué norma o procedimiento se incumplió y cualquier detalle relevante…" required></textarea></div>
+
+    <h3 class="sec"><i>5</i>Firmas</h3>
+    <div class="g2" id="grupoFirmas">
+      <div class="fg"><span class="lb">Firma de quien detecta la falta</span>
+        <div class="sig"><button type="button" class="clr" data-clear="sigDetecta">Limpiar</button><canvas id="sigDetecta" width="480" height="160" aria-label="Firma de quien detecta la falta"></canvas></div></div>
+      <div class="fg"><span class="lb">Firma de quien comete la falta</span>
+        <div class="sig"><button type="button" class="clr" data-clear="sigInfractor">Limpiar</button><canvas id="sigInfractor" width="480" height="160" aria-label="Firma de quien comete la falta"></canvas></div></div>
+    </div>
+
+    <div id="formMsg" class="msg" role="alert" hidden></div>
+    <div id="readOnlyNote" class="note" hidden>Tu acceso solo permite ver los registros.</div>
+    <div class="acts">
+      <button type="button" class="btn g" id="btnReset">Limpiar formulario</button>
+      <button type="submit" class="btn p" id="btnSubmit">Registrar comparendo</button>
+    </div>
+  </form>
+
+  <section class="card" data-view="registros">
+    <div class="head"><h2>Comparendos registrados</h2>
+      <div class="tools">
+        <input type="search" id="buscar" class="find" placeholder="Buscar por nombre o cédula…" aria-label="Buscar">
+        <select id="fTipo" class="fsel" aria-label="Filtrar por tipo"><option value="">Todos los tipos</option><option>SST</option><option>Calidad</option><option>Operación</option></select>
+        <button type="button" class="btn g sm" id="btnCsv">Exportar CSV</button>
+      </div></div>
+    <div id="localNotice" class="note" hidden>Esta vista no tiene base de datos compartida: los registros se guardan solo en este navegador.</div>
+    <div class="recs" id="records"></div>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(function(){'use strict';
+var COL='comparendos',LK='comparendos_jolifoods_local',$=function(i){return document.getElementById(i)};
+var db=null,mode='connecting',canWrite=true,canAdmin=false,records=[],openIds=new Set(),tipo='',afect='',q='',signed={sigDetecta:false,sigInfractor:false};
+var P={'1017001':{nombre:'Juan Camilo Arboleda',cargo:'Líder de Producción'},'1017002':{nombre:'Carlos Mario Pérez',cargo:'Operario de Empaque'},'1017003':{nombre:'Ana María Gómez',cargo:'Inspectora de Calidad'},'1017004':{nombre:'Luis Fernando Toro',cargo:'Coordinador SST'},'1017005':{nombre:'Andrés Felipe Ruiz',cargo:'Auxiliar de Logística'}};
+['detecta','infractor'].forEach(function(p){$(p+'Cedula').addEventListener('input',function(e){var x=P[e.target.value.trim()];if(x){$(p+'Nombre').value=x.nombre;$(p+'Cargo').value=x.cargo}})});
+
+function setNow(){var d=new Date(),p=function(n){return String(n).padStart(2,'0')};$('fecha').value=d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());$('hora').value=p(d.getHours())+':'+p(d.getMinutes())}
+function choices(sel,attr,fn){var bs=[].slice.call(document.querySelectorAll(sel));bs.forEach(function(b){b.addEventListener('click',function(){bs.forEach(function(x){x.setAttribute('aria-pressed','false')});b.setAttribute('aria-pressed','true');fn(b.getAttribute(attr))})});return bs}
+var tBtn=choices('.choice[data-type]','data-type',function(v){tipo=v}),aBtn=choices('.choice[data-afect]','data-afect',function(v){afect=v});
+
+function initCanvas(id){var c=$(id),x=c.getContext('2d'),d=false;x.strokeStyle='#1b2234';x.lineWidth=2.5;x.lineCap='round';x.lineJoin='round';
+ function pos(e){var r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*(c.width/r.width),y:(e.clientY-r.top)*(c.height/r.height)}}
+ c.addEventListener('pointerdown',function(e){d=true;try{c.setPointerCapture(e.pointerId)}catch(_){}var p=pos(e);x.beginPath();x.moveTo(p.x,p.y);e.preventDefault()});
+ c.addEventListener('pointermove',function(e){if(!d)return;var p=pos(e);x.lineTo(p.x,p.y);x.stroke();signed[id]=true;e.preventDefault()});
+ c.addEventListener('pointerup',function(){d=false});c.addEventListener('pointercancel',function(){d=false})}
+function clearSig(id){var c=$(id);c.getContext('2d').clearRect(0,0,c.width,c.height);signed[id]=false}
+function exportSig(id){var c=$(id),o=document.createElement('canvas');o.width=c.width;o.height=c.height;var x=o.getContext('2d');x.fillStyle='#fcfcfd';x.fillRect(0,0,o.width,o.height);x.drawImage(c,0,0);return o.toDataURL('image/png')}
+initCanvas('sigDetecta');initCanvas('sigInfractor');
+document.querySelectorAll('[data-clear]').forEach(function(b){b.addEventListener('click',function(){clearSig(b.getAttribute('data-clear'))})});
+
+function showMsg(t,sc){var b=$('formMsg');b.textContent=t;b.hidden=false;if(sc)sc.scrollIntoView({block:'center'})}
+var tt=null;function toast(t){var e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(tt);tt=setTimeout(function(){e.hidden=true},3000)}
+function setSync(s){mode=s;var e=$('sync');e.setAttribute('data-state',s);
+ var L={connecting:'Conectando…',shared:'Compartido en tiempo real',local:'Solo en este dispositivo',error:'Sin conexión con la base'};
+ e.textContent=L[s];$('localNotice').hidden=s!=='local'}
+
+function loadLocal(){try{return JSON.parse(localStorage.getItem(LK)||'[]')}catch(e){return[]}}
+function saveLocal(){try{localStorage.setItem(LK,JSON.stringify(records))}catch(e){}}
+async function saveRecord(r){if(mode==='shared'&&db){await db.collection(COL).add(r)}else{records.unshift(Object.assign({id:'local-'+r.creadoEn},r));saveLocal();setSync('local');render()}}
+async function deleteRecord(id){if(mode==='shared'&&db){await db.doc(COL+'/'+id).delete()}else{records=records.filter(function(r){return r.id!==id});saveLocal();setSync('local');render()}}
+
+function resetForm(){$('comparendoForm').reset();tipo='';afect='';tBtn.concat(aBtn).forEach(function(b){b.setAttribute('aria-pressed','false')});clearSig('sigDetecta');clearSig('sigInfractor');$('formMsg').hidden=true;setNow()}
+$('btnReset').addEventListener('click',resetForm);
+$('comparendoForm').addEventListener('submit',async function(e){e.preventDefault();$('formMsg').hidden=true;if(!canWrite)return;
+ if(!tipo)return showMsg('Selecciona el tipo o dominio: SST, Calidad u Operación.',$('grupoTipo'));
+ if(!afect)return showMsg('Selecciona el tipo de afectación.',$('grupoAfect'));
+ if(!signed.sigDetecta||!signed.sigInfractor)return showMsg('Faltan las dos firmas: quien detecta y quien comete la falta.',$('grupoFirmas'));
+ var v=function(i){return $(i).value.trim()};
+ var rec={creadoEn:Date.now(),fecha:$('fecha').value,hora:$('hora').value,departamento:$('departamento').value,tipo:tipo,afectacion:afect,
+  detecta:{cedula:v('detectaCedula'),nombre:v('detectaNombre'),cargo:v('detectaCargo')},infractor:{cedula:v('infractorCedula'),nombre:v('infractorNombre'),cargo:v('infractorCargo')},
+  descripcion:v('descripcion'),firmaDetecta:exportSig('sigDetecta'),firmaInfractor:exportSig('sigInfractor')};
+ var b=$('btnSubmit');b.disabled=true;b.textContent='Guardando…';
+ try{await saveRecord(rec);toast('Comparendo registrado');resetForm();go('registros')}catch(err){showMsg('No se pudo guardar el comparendo. Revisa tu conexión e inténtalo de nuevo.')}
+ finally{b.disabled=!canWrite;b.textContent='Registrar comparendo'}});
+
+function el(t,c,x){var n=document.createElement(t);if(c)n.className=c;if(x!==undefined&&x!==null)n.textContent=x;return n}
+function fmt(f,h){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(f||''),b=f||'';if(m)b=new Date(+m[1],+m[2]-1,+m[3]).toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'});return h?b+' · '+h:b}
+function person(p){return(p&&typeof p==='object')?p:{cedula:'',nombre:String(p||''),cargo:''}}
+function fact(l,v){var f=el('div','fact');f.append(el('span','lb',l),el('div',null,v||'—'));return f}
+function sigFig(src,cap){var f=el('figure');if(typeof src==='string'&&src.indexOf('data:image/png;base64,')===0){var i=document.createElement('img');i.src=src;i.alt=cap;f.append(i)}else f.append(el('div','mut','Sin firma'));f.append(el('figcaption',null,cap));return f}
+var TC={'SST':'s','Calidad':'c','Operación':'o'};
+
+function recEl(r){var det=person(r.detecta),inf=person(r.infractor),k=TC[r.tipo]||'';
+ var d=el('details','rec'+(k?' t-'+k:''));if(openIds.has(r.id))d.open=true;
+ d.addEventListener('toggle',function(){if(d.open)openIds.add(r.id);else openIds.delete(r.id)});
+ var s=el('summary'),top=el('div','rt');top.append(el('span','chip '+k,r.tipo||'—'),el('span','chip',r.afectacion||'—'),el('span','chip',r.departamento||'—'),el('time',null,fmt(r.fecha,r.hora)));
+ var m=el('div','rm');m.append(el('strong',null,inf.nombre||'Sin nombre'),el('span','mut','Detectó: '+(det.nombre||'—')));s.append(top,m);d.append(s);
+ var b=el('div','rb'),fs=el('div','facts'),j=function(p){return[p.nombre,p.cargo,p.cedula&&'C.C. '+p.cedula].filter(Boolean).join(' · ')};
+ fs.append(fact('Detecta la falta',j(det)),fact('Comete la falta',j(inf)));b.append(fs);
+ var st=el('div','fact');st.append(el('span','lb','Descripción de los hechos'),el('div','story',r.descripcion||'—'));b.append(st);
+ var sg=el('div','sigs');sg.append(sigFig(r.firmaDetecta,'Firma de quien detecta'),sigFig(r.firmaInfractor,'Firma de quien comete'));b.append(sg);
+ if(canAdmin){var x=el('button','del','Eliminar registro');x.type='button';var tm=null;
+  x.addEventListener('click',async function(){if(x.getAttribute('data-armed')!=='true'){x.setAttribute('data-armed','true');x.textContent='Confirmar eliminación';tm=setTimeout(function(){x.removeAttribute('data-armed');x.textContent='Eliminar registro'},4000);return}
+   clearTimeout(tm);x.disabled=true;try{await deleteRecord(r.id);toast('Registro eliminado')}catch(e){x.disabled=false;toast('No se pudo eliminar')}});b.append(x)}
+ d.append(b);return d}
+
+function render(){var n=function(t){return records.filter(function(r){return r.tipo===t}).length};
+ charts();$('kTot').textContent=records.length;$('kSST').textContent=n('SST');$('kCal').textContent=n('Calidad');$('kOpe').textContent=n('Operación');
+ var list=$('records');list.textContent='';
+ var f=records.filter(function(r){if(ft&&r.tipo!==ft)return false;if(!q)return true;var a=person(r.detecta),i=person(r.infractor);return[a.nombre,a.cedula,i.nombre,i.cedula].join(' ').toLowerCase().indexOf(q)>-1});
+ if(!f.length){var e=el('div','empty');e.append(el('strong',null,records.length?'Sin resultados':'Aún no hay comparendos registrados'),el('span',null,records.length?'Prueba con otro nombre o cédula.':'Completa el formulario y firma. El registro aparecerá aquí.'));list.append(e);return}
+ f.forEach(function(r){list.append(recEl(r))})}
+$('buscar').addEventListener('input',function(e){q=e.target.value.trim().toLowerCase();render()});
+
+function goLocal(){db=null;records=loadLocal();canAdmin=true;setSync('local');render()}
+async function connect(){var cl=window.claude;if(!cl||typeof cl.use!=='function')return goLocal();var user=null;
+ try{db=await cl.use('db');user=await cl.use('user')}catch(e){db=null}
+ if(!db)return goLocal();
+ if(user){try{canAdmin=!!(await user.canEdit());canWrite=(await user.can('data.write'))!==false}catch(e){}}
+ if(!canWrite){$('btnSubmit').disabled=true;$('readOnlyNote').hidden=false}
+ mode='shared';db.collection(COL).orderBy('creadoEn','desc').limit(200).onSnapshot(function(sn){records=sn.docs.map(function(d){return Object.assign({id:d.id},d.data())});setSync('shared');render()},function(){setSync('error')})}
+var ft='';
+var VW={resumen:['Resumen general','Indicadores de los comparendos registrados'],nuevo:['Nuevo comparendo','Complete los datos, elija la afectación y registre las firmas'],registros:['Registros','Consulte, filtre y exporte los comparendos']};
+function go(v){if(!VW[v])v='resumen';document.body.setAttribute('data-v',v);$('pgT').textContent=VW[v][0];$('pgS').textContent=VW[v][1];
+ document.querySelectorAll('[data-go]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-go')===v)});
+ if(location.hash!=='#'+v)history.replaceState(null,'','#'+v);window.scrollTo(0,0)}
+document.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){go(b.getAttribute('data-go'))})});
+window.addEventListener('hashchange',function(){go(location.hash.slice(1))});
+function bars(id,key){var c={};records.forEach(function(r){var k=r[key]||'—';c[k]=(c[k]||0)+1});
+ var ks=Object.keys(c).sort(function(a,b){return c[b]-c[a]}),mx=Math.max.apply(null,ks.map(function(k){return c[k]}).concat(1)),box=$(id);box.textContent='';
+ if(!ks.length){box.append(el('div','mut','Sin datos todavía'));return}
+ ks.forEach(function(k){var r=el('div','bar-r'),t=el('div','bar-t'),tr=el('div','bar-b'),f=el('i');t.append(el('span',null,k),el('b',null,c[k]));f.style.width=Math.round(c[k]/mx*100)+'%';tr.append(f);r.append(t,tr);box.append(r)})}
+function charts(){bars('bTipo','tipo');bars('bDep','departamento');bars('bAf','afectacion');
+ var rc=$('recent');rc.textContent='';if(!records.length)rc.append(el('div','mut','Aún no hay comparendos registrados.'));
+ records.slice(0,5).forEach(function(r){var i=person(r.infractor),w=el('div','rw');w.append(el('strong',null,i.nombre||'Sin nombre'),el('span','chip '+(TC[r.tipo]||''),r.tipo||'—'),el('time','mut',fmt(r.fecha,r.hora)));rc.append(w)})}
+$('fTipo').addEventListener('change',function(e){ft=e.target.value;render()});
+$('btnCsv').addEventListener('click',function(){if(!records.length)return toast('No hay registros para exportar');
+ var H=['Fecha','Hora','Departamento','Tipo','Afectación','Detecta cédula','Detecta nombre','Detecta cargo','Comete cédula','Comete nombre','Comete cargo','Descripción'];
+ var cv=function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'};
+ var rows=records.map(function(r){var a=person(r.detecta),i=person(r.infractor);return[r.fecha,r.hora,r.departamento,r.tipo,r.afectacion,a.cedula,a.nombre,a.cargo,i.cedula,i.nombre,i.cargo,r.descripcion].map(cv).join(',')});
+ var blob=new Blob(['\ufeff'+[H.map(cv).join(',')].concat(rows).join('\r\n')],{type:'text/csv;charset=utf-8'});
+ var lk=document.createElement('a');lk.href=URL.createObjectURL(blob);lk.download='comparendos_jolifoods.csv';document.body.append(lk);lk.click();lk.remove()});
+setNow();render();connect();go((location.hash||'#resumen').slice(1));
+})();
+</script>
+</body>
+</html>
