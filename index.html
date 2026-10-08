@@ -53,7 +53,7 @@ main{padding-block:24px 48px}
 .g3,.g2{display:grid;gap:16px}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .fg{display:flex;flex-direction:column;gap:6px;min-width:0}
 label,.lb{font-size:.78rem;font-weight:600;color:var(--mut)}
-input[type=text],input[type=date],input[type=time],input[type=search],select,textarea{width:100%;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--field);font-size:16px;transition:border-color .15s,box-shadow .15s}
+input[type=text],input[type=date],input[type=time],input[type=search],input[type=password],select,textarea{width:100%;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--field);font-size:16px;transition:border-color .15s,box-shadow .15s}
 textarea{resize:vertical;line-height:1.45}
 input:focus,select:focus,textarea:focus{outline:0;border-color:var(--brand2);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand2) 22%,transparent)}
 button:focus-visible,summary:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
@@ -140,12 +140,26 @@ main>[data-view]{animation:in .28s ease}
 .fsel{width:auto}
 .btn.sm{padding:9px 14px;font-size:.85rem}
 @media (max-width:760px){.charts{grid-template-columns:minmax(0,1fr)}.pagehead{padding:20px 0 14px}.pagehead h1{font-size:1.35rem}.tools{width:100%}.fsel{flex:1}}
+
+/* Inicio de sesión */
+.lg{position:fixed;inset:0;z-index:20;background:linear-gradient(135deg,var(--brand2),#1d1c3d);display:grid;place-items:center;padding:16px;overflow:auto}
+.lgc{background:var(--card);border-radius:16px;padding:32px;width:100%;max-width:380px;display:flex;flex-direction:column;gap:8px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.lgc .logo{margin:0 auto 6px}.lgc h2{margin:0;text-align:center;font-size:1.3rem}
+.lgc p{margin:0 0 12px;color:var(--mut);text-align:center;font-size:.85rem}
+.lgc .btn{margin-top:10px}
+.lgerr{color:var(--sst);font-size:.85rem;font-weight:600;min-height:1.3em}
+body.locked{overflow:hidden}
+.rt2{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.who{font-size:.78rem;color:#c9cbe6}
+.out{background:rgba(255,255,255,.12);color:#fff;border:0;border-radius:99px;padding:5px 12px;font-size:.78rem;font-weight:600;cursor:pointer}
+.out:hover{background:rgba(255,255,255,.22)}
+@media (max-width:760px){.who{display:none}}
 </style>
 </head>
 <body data-v="resumen">
 <header class="top"><div class="wrap bar">
   <div class="brand"><span class="logo">J</span><div><b>Jolifoods S.A.S</b><small>Control de Comparendos Disciplinarios</small></div></div>
-  <span class="sync" id="sync" data-state="connecting" aria-live="polite">Conectando…</span>
+  <div class="rt2"><span class="who" id="who"></span><span class="sync" id="sync" data-state="connecting" aria-live="polite">Conectando…</span><button type="button" class="out" id="btnOut" hidden>Cerrar sesión</button></div>
 </div>
   <nav class="wrap tabs" aria-label="Secciones">
     <button type="button" data-go="resumen" class="on">Resumen</button>
@@ -241,8 +255,16 @@ main>[data-view]{animation:in .28s ease}
     <div class="recs" id="records"></div>
   </section>
 </main>
+<div class="lg" id="login" hidden><form class="lgc" id="lgForm">
+  <div class="logo">J</div><h2>Iniciar sesión</h2><p>Control de Comparendos · Jolifoods S.A.S</p>
+  <label for="lgMail">Correo</label><input type="text" id="lgMail" inputmode="email" autocomplete="username" required>
+  <label for="lgPass">Contraseña</label><input type="password" id="lgPass" autocomplete="current-password" required>
+  <div class="lgerr" id="lgErr" role="alert"></div>
+  <button class="btn p" id="lgBtn" type="submit">Ingresar</button>
+</form></div>
 <div class="toast" id="toast" role="status" hidden></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){'use strict';
 var COL='comparendos',LK='comparendos_jolifoods_local',$=function(i){return document.getElementById(i)};
@@ -267,13 +289,11 @@ document.querySelectorAll('[data-clear]').forEach(function(b){b.addEventListener
 function showMsg(t,sc){var b=$('formMsg');b.textContent=t;b.hidden=false;if(sc)sc.scrollIntoView({block:'center'})}
 var tt=null;function toast(t){var e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(tt);tt=setTimeout(function(){e.hidden=true},3000)}
 function setSync(s){mode=s;var e=$('sync');e.setAttribute('data-state',s);
- var L={connecting:'Conectando…',shared:'Compartido en tiempo real',local:'Solo en este dispositivo',error:'Sin conexión con la base'};
+ var L={connecting:'Conectando…',shared:'Conectado a la base compartida',local:'Solo en este dispositivo',error:'Sin conexión con la base'};
  e.textContent=L[s];$('localNotice').hidden=s!=='local'}
 
 function loadLocal(){try{return JSON.parse(localStorage.getItem(LK)||'[]')}catch(e){return[]}}
 function saveLocal(){try{localStorage.setItem(LK,JSON.stringify(records))}catch(e){}}
-async function saveRecord(r){if(mode==='shared'&&db){await db.collection(COL).add(r)}else{records.unshift(Object.assign({id:'local-'+r.creadoEn},r));saveLocal();setSync('local');render()}}
-async function deleteRecord(id){if(mode==='shared'&&db){await db.doc(COL+'/'+id).delete()}else{records=records.filter(function(r){return r.id!==id});saveLocal();setSync('local');render()}}
 
 function resetForm(){$('comparendoForm').reset();tipo='';afect='';tBtn.concat(aBtn).forEach(function(b){b.setAttribute('aria-pressed','false')});clearSig('sigDetecta');clearSig('sigInfractor');$('formMsg').hidden=true;setNow()}
 $('btnReset').addEventListener('click',resetForm);
@@ -305,7 +325,7 @@ function recEl(r){var det=person(r.detecta),inf=person(r.infractor),k=TC[r.tipo]
  fs.append(fact('Detecta la falta',j(det)),fact('Comete la falta',j(inf)));b.append(fs);
  var st=el('div','fact');st.append(el('span','lb','Descripción de los hechos'),el('div','story',r.descripcion||'—'));b.append(st);
  var sg=el('div','sigs');sg.append(sigFig(r.firmaDetecta,'Firma de quien detecta'),sigFig(r.firmaInfractor,'Firma de quien comete'));b.append(sg);
- if(canAdmin){var x=el('button','del','Eliminar registro');x.type='button';var tm=null;
+ if(canAdmin&&r.owner&&r.owner===uid){var x=el('button','del','Eliminar registro');x.type='button';var tm=null;
   x.addEventListener('click',async function(){if(x.getAttribute('data-armed')!=='true'){x.setAttribute('data-armed','true');x.textContent='Confirmar eliminación';tm=setTimeout(function(){x.removeAttribute('data-armed');x.textContent='Eliminar registro'},4000);return}
    clearTimeout(tm);x.disabled=true;try{await deleteRecord(r.id);toast('Registro eliminado')}catch(e){x.disabled=false;toast('No se pudo eliminar')}});b.append(x)}
  d.append(b);return d}
@@ -319,12 +339,25 @@ function render(){var n=function(t){return records.filter(function(r){return r.t
 $('buscar').addEventListener('input',function(e){q=e.target.value.trim().toLowerCase();render()});
 
 function goLocal(){db=null;records=loadLocal();canAdmin=true;setSync('local');render()}
-async function connect(){var cl=window.claude;if(!cl||typeof cl.use!=='function')return goLocal();var user=null;
- try{db=await cl.use('db');user=await cl.use('user')}catch(e){db=null}
- if(!db)return goLocal();
- if(user){try{canAdmin=!!(await user.canEdit());canWrite=(await user.can('data.write'))!==false}catch(e){}}
- if(!canWrite){$('btnSubmit').disabled=true;$('readOnlyNote').hidden=false}
- mode='shared';db.collection(COL).orderBy('creadoEn','desc').limit(200).onSnapshot(function(sn){records=sn.docs.map(function(d){return Object.assign({id:d.id},d.data())});setSync('shared');render()},function(){setSync('error')})}
+var SB_URL='https://aflnjcndjvawlqmlpikx.supabase.co',SB_KEY='sb_publishable_S7pe8yq1qNwKPLzh7t9NKw_qvtq3Mc6',sb=null,uid=null,poll=null;
+function rowToRec(d){return{id:d.id,owner:d.creado_por,creadoEn:Date.parse(d.creado_en),fecha:d.fecha,hora:(d.hora||'').slice(0,5),departamento:d.departamento,tipo:d.tipo,afectacion:d.afectacion,detecta:d.detecta,infractor:d.infractor,descripcion:d.descripcion,firmaDetecta:d.firma_detecta,firmaInfractor:d.firma_infractor}}
+async function loadRecords(){var x=await sb.from('comparendos').select('*').order('creado_en',{ascending:false}).limit(200);if(x.error){setSync('error');return}records=x.data.map(rowToRec);setSync('shared');render()}
+async function saveRecord(r){var x=await sb.from('comparendos').insert({fecha:r.fecha,hora:r.hora,departamento:r.departamento,tipo:r.tipo,afectacion:r.afectacion,detecta:r.detecta,infractor:r.infractor,descripcion:r.descripcion,firma_detecta:r.firmaDetecta,firma_infractor:r.firmaInfractor});if(x.error)throw x.error;await loadRecords()}
+async function deleteRecord(id){var x=await sb.from('comparendos').delete().eq('id',id);if(x.error)throw x.error;await loadRecords()}
+function showLogin(m){$('login').hidden=false;$('lgErr').textContent=m||'';document.body.classList.add('locked')}
+async function start(user){uid=user.id;$('login').hidden=true;document.body.classList.remove('locked');$('who').textContent=user.email;$('btnOut').hidden=false;canAdmin=true;mode='shared';await loadRecords();clearInterval(poll);poll=setInterval(loadRecords,30000)}
+async function connect(){
+ if(!window.supabase)return showLogin('No se pudo cargar Supabase. Revisa tu conexión a internet.');
+ sb=window.supabase.createClient(SB_URL,SB_KEY);
+ var s=await sb.auth.getSession();
+ if(s.data.session)start(s.data.session.user);else showLogin();
+ sb.auth.onAuthStateChange(function(ev){if(ev==='SIGNED_OUT'){uid=null;records=[];clearInterval(poll);render();$('btnOut').hidden=true;$('who').textContent='';showLogin()}})}
+$('lgForm').addEventListener('submit',async function(e){e.preventDefault();if(!sb)return;var b=$('lgBtn');b.disabled=true;b.textContent='Ingresando…';$('lgErr').textContent='';
+ var r=await sb.auth.signInWithPassword({email:$('lgMail').value.trim(),password:$('lgPass').value});
+ b.disabled=false;b.textContent='Ingresar';
+ if(r.error)return $('lgErr').textContent='Correo o contraseña incorrectos.';
+ $('lgPass').value='';start(r.data.user)});
+$('btnOut').addEventListener('click',function(){sb.auth.signOut()});
 var ft='';
 var VW={resumen:['Resumen general','Indicadores de los comparendos registrados'],nuevo:['Nuevo comparendo','Complete los datos, elija la afectación y registre las firmas'],registros:['Registros','Consulte, filtre y exporte los comparendos']};
 function go(v){if(!VW[v])v='resumen';document.body.setAttribute('data-v',v);$('pgT').textContent=VW[v][0];$('pgS').textContent=VW[v][1];
