@@ -295,24 +295,6 @@ main > [data-view] { animation: fadeUp .25s ease both }
 }
 .wide { grid-column: 1/-1 }
 
-/* Bar charts */
-.bar-r + .bar-r { margin-top: 16px }
-.bar-t {
-  display: flex; justify-content: space-between;
-  font-size: .82rem; margin-bottom: 7px;
-  font-weight: 500;
-}
-.bar-t b { font-weight: 700; font-variant-numeric: tabular-nums }
-.bar-b {
-  height: 7px; background: var(--soft);
-  border-radius: 99px; overflow: hidden;
-}
-.bar-b i {
-  display: block; height: 100%; border-radius: 99px;
-  background: linear-gradient(90deg, var(--brand3), var(--acc));
-  transition: width .6s cubic-bezier(.4,0,.2,1);
-}
-
 /* Recent list */
 .rw {
   display: flex; align-items: center; gap: 12px;
@@ -716,6 +698,7 @@ body.locked { overflow: hidden }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important } }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 </head>
 <body data-v="resumen">
 
@@ -765,9 +748,9 @@ body.locked { overflow: hidden }
 
   <!-- Charts -->
   <section class="charts" data-view="resumen">
-    <div class="card ch"><h3>Por tipo</h3><div id="bTipo"></div></div>
-    <div class="card ch"><h3>Por departamento</h3><div id="bDep"></div></div>
-    <div class="card ch"><h3>Por afectación</h3><div id="bAf"></div></div>
+    <div class="card ch"><h3>Por tipo</h3><div style="position:relative;height:220px"><canvas id="cTipo"></canvas></div></div>
+    <div class="card ch"><h3>Por departamento</h3><div style="position:relative;height:220px"><canvas id="cDep"></canvas></div></div>
+    <div class="card ch"><h3>Por afectación</h3><div style="position:relative;height:220px"><canvas id="cAf"></canvas></div></div>
     <div class="card ch wide"><h3>Últimos comparendos</h3><div id="recent"></div></div>
   </section>
 
@@ -990,13 +973,165 @@ function go(v){if(!VW[v])v='resumen';document.body.setAttribute('data-v',v);$('p
  if(location.hash!=='#'+v)history.replaceState(null,'','#'+v);window.scrollTo(0,0)}
 document.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){go(b.getAttribute('data-go'))})});
 window.addEventListener('hashchange',function(){go(location.hash.slice(1))});
-function bars(id,key){var c={};records.forEach(function(r){var k=r[key]||'—';c[k]=(c[k]||0)+1});
- var ks=Object.keys(c).sort(function(a,b){return c[b]-c[a]}),mx=Math.max.apply(null,ks.map(function(k){return c[k]}).concat(1)),box=$(id);box.textContent='';
- if(!ks.length){box.append(el('div','mut','Sin datos todavía'));return}
- ks.forEach(function(k){var r=el('div','bar-r'),t=el('div','bar-t'),tr=el('div','bar-b'),f=el('i');t.append(el('span',null,k),el('b',null,c[k]));f.style.width=Math.round(c[k]/mx*100)+'%';tr.append(f);r.append(t,tr);box.append(r)})}
-function charts(){bars('bTipo','tipo');bars('bDep','departamento');bars('bAf','afectacion');
- var rc=$('recent');rc.textContent='';if(!records.length)rc.append(el('div','mut','Aún no hay comparendos registrados.'));
- records.slice(0,5).forEach(function(r){var i=person(r.infractor),w=el('div','rw');w.append(el('strong',null,i.nombre||'Sin nombre'),el('span','chip '+(TC[r.tipo]||''),r.tipo||'—'),el('time','mut',fmt(r.fecha,r.hora)));rc.append(w)})}
+
+// ── Chart.js helpers ─────────────────────────────────────────
+var chartInstances = {};
+var CHART_COLORS = {
+  SST:       { bg: 'rgba(231,76,60,0.85)',  border: '#c0392b' },
+  Calidad:   { bg: 'rgba(39,174,96,0.85)',  border: '#1a7f47' },
+  'Operación':{ bg: 'rgba(41,128,185,0.85)', border: '#1557ab' },
+  _default:  { bg: 'rgba(61,58,142,0.85)',  border: '#2d2b6b' }
+};
+var AFECT_COLORS = [
+  'rgba(200,162,58,0.85)', 'rgba(61,58,142,0.85)',
+  'rgba(39,174,96,0.85)',  'rgba(231,76,60,0.85)'
+];
+
+function isDark(){
+  return window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;
+}
+function chartDefaults(){
+  var dark = isDark();
+  return {
+    color: dark ? '#9aa1b8' : '#6b7194',
+    gridColor: dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'
+  };
+}
+
+function makeBarChart(id, labels, data, colors){
+  var ctx = document.getElementById(id);
+  if(!ctx) return;
+  if(chartInstances[id]){ chartInstances[id].destroy(); }
+  var d = chartDefaults();
+  chartInstances[id] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets:[{
+        data: data,
+        backgroundColor: colors,
+        borderColor: colors.map(function(c){ return c.replace('0.85','1'); }),
+        borderWidth: 0,
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options:{
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins:{
+        legend:{ display: false },
+        tooltip:{
+          callbacks:{
+            label: function(ctx){ return '  '+ctx.parsed.x+' comparendo'+(ctx.parsed.x!==1?'s':''); }
+          }
+        }
+      },
+      scales:{
+        x:{
+          beginAtZero: true,
+          ticks:{ color: d.color, stepSize:1, precision:0 },
+          grid:{ color: d.gridColor },
+          border:{ display:false }
+        },
+        y:{
+          ticks:{ color: d.color, font:{ weight:'600' } },
+          grid:{ display:false },
+          border:{ display:false }
+        }
+      },
+      animation:{ duration: 500, easing:'easeOutQuart' }
+    }
+  });
+}
+
+function makeDoughnutChart(id, labels, data, colors){
+  var ctx = document.getElementById(id);
+  if(!ctx) return;
+  if(chartInstances[id]){ chartInstances[id].destroy(); }
+  var d = chartDefaults();
+  chartInstances[id] = new Chart(ctx, {
+    type: 'doughnut',
+    data:{
+      labels: labels,
+      datasets:[{
+        data: data,
+        backgroundColor: colors,
+        borderColor: isDark() ? '#161828' : '#ffffff',
+        borderWidth: 3,
+        hoverOffset: 6
+      }]
+    },
+    options:{
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '62%',
+      plugins:{
+        legend:{
+          position:'bottom',
+          labels:{ color: d.color, padding:14, boxWidth:12, boxHeight:12, borderRadius:4, useBorderRadius:true, font:{ size:12, weight:'600' } }
+        },
+        tooltip:{
+          callbacks:{
+            label: function(ctx){ return ' '+ctx.label+': '+ctx.parsed+' ('+Math.round(ctx.parsed/ctx.dataset.data.reduce(function(a,b){return a+b},0)*100)+'%)'; }
+          }
+        }
+      },
+      animation:{ duration: 500, easing:'easeOutQuart' }
+    }
+  });
+}
+
+function charts(){
+  // KPIs y recent list (lógica original intacta)
+  var rc=$('recent');rc.textContent='';
+  if(!records.length) rc.append(el('div','mut','Aún no hay comparendos registrados.'));
+  records.slice(0,5).forEach(function(r){
+    var i=person(r.infractor),w=el('div','rw');
+    w.append(el('strong',null,i.nombre||'Sin nombre'),el('span','chip '+(TC[r.tipo]||''),r.tipo||'—'),el('time','mut',fmt(r.fecha,r.hora)));
+    rc.append(w);
+  });
+
+  // Gráfica: Por tipo (doughnut)
+  var tipoCount={SST:0,Calidad:0,'Operación':0};
+  records.forEach(function(r){ if(tipoCount[r.tipo]!==undefined) tipoCount[r.tipo]++; });
+  var tipoLabels=Object.keys(tipoCount).filter(function(k){return tipoCount[k]>0});
+  var tipoData=tipoLabels.map(function(k){return tipoCount[k];});
+  var tipoColors=tipoLabels.map(function(k){return (CHART_COLORS[k]||CHART_COLORS._default).bg;});
+  if(tipoData.length){
+    makeDoughnutChart('cTipo', tipoLabels, tipoData, tipoColors);
+  } else {
+    var ctx=document.getElementById('cTipo');
+    if(ctx){ var p=ctx.parentNode; p.innerHTML='<p style="text-align:center;color:var(--mut);margin-top:60px;font-size:.88rem">Sin datos todavía</p>'; }
+  }
+
+  // Gráfica: Por departamento (barras horizontales)
+  var depCount={};
+  records.forEach(function(r){ var k=r.departamento||'—'; depCount[k]=(depCount[k]||0)+1; });
+  var depLabels=Object.keys(depCount).sort(function(a,b){return depCount[b]-depCount[a];});
+  var depData=depLabels.map(function(k){return depCount[k];});
+  var depColors=depLabels.map(function(_,i){return AFECT_COLORS[i%AFECT_COLORS.length];});
+  if(depData.length){
+    makeBarChart('cDep', depLabels, depData, depColors);
+  } else {
+    var ctx2=document.getElementById('cDep');
+    if(ctx2){ var p2=ctx2.parentNode; p2.innerHTML='<p style="text-align:center;color:var(--mut);margin-top:60px;font-size:.88rem">Sin datos todavía</p>'; }
+  }
+
+  // Gráfica: Por afectación (barras horizontales)
+  var afCount={};
+  records.forEach(function(r){ var k=r.afectacion||'—'; afCount[k]=(afCount[k]||0)+1; });
+  var afLabels=Object.keys(afCount).sort(function(a,b){return afCount[b]-afCount[a];});
+  var afData=afLabels.map(function(k){return afCount[k];});
+  var afColors=afLabels.map(function(_,i){return AFECT_COLORS[i%AFECT_COLORS.length];});
+  if(afData.length){
+    makeBarChart('cAf', afLabels, afData, afColors);
+  } else {
+    var ctx3=document.getElementById('cAf');
+    if(ctx3){ var p3=ctx3.parentNode; p3.innerHTML='<p style="text-align:center;color:var(--mut);margin-top:60px;font-size:.88rem">Sin datos todavía</p>'; }
+  }
+}
 $('fTipo').addEventListener('change',function(e){ft=e.target.value;render()});
 $('btnCsv').addEventListener('click',function(){if(!records.length)return toast('No hay registros para exportar');
  var H=['Fecha','Hora','Departamento','Tipo','Afectación','Detecta cédula','Detecta nombre','Detecta cargo','Comete cédula','Comete nombre','Comete cargo','Descripción'];
